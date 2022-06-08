@@ -1,5 +1,5 @@
 # Notebook Snippets
-This repository contains a collection of files which can be loaded into a notebook to provide certain commonly used functionality.  
+This repository contains a collection of files which can be loaded into a notebook to provide certain commonly used functionality.
 It is catered to my own personal needs, but feel free to look around and copy stuff.
 
 
@@ -20,7 +20,7 @@ If you ever want to share a notebook with someone who might not have these snipp
 
 ## Why no package
 The alternative to these snippets is to create a python package and install it locally (eg. in dev mode).  
-While this is a clean solution, this means we need to reinstall the package in every environment and needlessly pollutes your installs with a package only useful for notebooks.
+While this is a clean solution, this means we need to reinstall the package in every environment and it needlessly pollutes your installs with a package only useful for notebooks.
 Moreover, when developing packages, I have a tendency to over-engineer things and create complex import systems.  
 By using these snippets, I force myself to create small, laser-focused scripts instead of an unmanageable behemoth of a package with unrelated content everywhere.
 
@@ -36,4 +36,4 @@ A few guidelines I need to consider when writing these snippets:
   It is better to `%run` or `%load` multiple files if necessary, than to load a bunch of unused functions.
 
 - Do not forget to add a docstring with *args* and *examples* sections.  
-  When we `%run` a file, we do not see its contents, so having proper docstrings gives much better developer experience.
+  When we `%run` a file, we do not see its contents, so having proper docstrings gives a much better developer experience.
