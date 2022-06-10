@@ -1,5 +1,5 @@
 #
-#   Matplotlib plotting functions notebooks
+#   Matplotlib plotting functions for notebooks
 #   Tanguy Ophoff
 #
 
@@ -71,3 +71,7 @@ def plot_tide(tide_series, *, errors_lim=None, fpfn_lim=None, no_zero=False, col
         fpfn_ax.set_xlim(fpfn_lim)
 
     return ax
+
+
+if __name__ == '__main__':
+    print('functions: plot_tide')

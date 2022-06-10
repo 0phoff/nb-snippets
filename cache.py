@@ -116,3 +116,7 @@ def cache_df(*args, basefolder='/tmp'):
         save_fn=lambda df, path: df.to_pickle(path),
         load_fn=pd.read_pickle,
     )
+
+
+if __name__ == '__main__':
+    print('functions: cache, cache_df')

@@ -37,3 +37,6 @@ A few guidelines I need to consider when writing these snippets:
 
 - Do not forget to add a docstring with *args* and *examples* sections.  
   When we `%run` a file, we do not see its contents, so having proper docstrings gives a much better developer experience.
+
+- Add a print statement (guarded inside an `if __name__ == '__main__` block) to print all exported variables (functions, classes, etc.)  
+  When using these snippets with `%run`, we cannot see the code and thus having a small overview of the exported symbols is handy!
