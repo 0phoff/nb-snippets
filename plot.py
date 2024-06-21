@@ -3,6 +3,71 @@
 #   Tanguy Ophoff
 #
 
+def plot_images(*images, rows=1, titles=None, normalize=True):
+    """
+    This function can plot images in a grid with matplotlib.
+
+    Args:
+        *images (PIL.Image, torch.Tensor, np.ndarray): Images to plot (numpy arrays are expected to be BGR from opencv)
+        rows (int, optional): Number of rows in the grid; Default: 1
+        titles (list[str], optional): Title strings for the different images; Default: None
+        normalize (bool, optional): Whether to rescale the image data from min-max to 0-255; Default: True
+
+    Returns:
+        (matplotlib.figure.Figure): Matplotlib figure handle
+
+    Libraries:
+        matplotlib
+        numpy
+        torch (optional)
+        PIL (optional)
+
+    Example:
+        >>> plot_images(img1, img2, img3, img4, rows=2)
+        >>> plt.show()
+    """
+    import numpy as np
+    import matplotlib.pyplot as plt
+    try:
+        import torch
+    except ImportError:
+        torch = None
+    try:
+        from PIL import Image
+    except ImportError:
+        Image = None
+
+    def image_to_array(img):
+        if torch is not None and isinstance(img, torch.Tensor):
+            return np.transpose(img.cpu().detach().numpy(), (1, 2, 0))
+        if Image is not None and isinstance(img, Image):
+            return np.asarray(img)
+        if isinstance(img, np.ndarray) and img.ndim == 3:
+            return img[..., ::-1]
+        return np.asarray(img)
+
+    images = tuple(image_to_array(img) for img in images)
+    cols = math.ceil(len(images) / rows)
+    fig, axes = plt.subplots(rows, cols, figsize=(5*cols,3*rows), constrained_layout=True)
+    axes = axes.flatten()
+
+    for idx, (ax, img) in enumerate(zip(axes, images)):
+        if normalize:
+            ax.imshow(img, cmap='gray')
+        else:
+            ax.imshow(img, vmin=0, vmax=255 if img.max() > 1 else 1, cmap='gray')
+        
+        ax.grid(None)
+        ax.tick_params(left=False, right=False, labelleft=False, labelbottom=False, bottom=False) 
+        ax.spines['bottom'].set(edgecolor='black', lw=1)
+        ax.spines['top'].set(edgecolor='black', lw=1)
+        ax.spines['left'].set(edgecolor='black', lw=1)
+        ax.spines['right'].set(edgecolor='black', lw=1)
+        if titles is not None and len(titles) > idx:
+            ax.set_title(titles[idx])
+
+    return fig
+
 def plot_tide(tide_series, *, errors_lim=None, fpfn_lim=None, no_zero=False, color=None, saturation=0.75, ax=None, **kwargs):
     """
     This function can plot the results of a `brambox.eval.TIDE` series with matplotlib.
@@ -13,13 +78,21 @@ def plot_tide(tide_series, *, errors_lim=None, fpfn_lim=None, no_zero=False, col
         fpfn_lim (list): Axis limits for the fpfn barplot; Default None
         no_zero (bool): Remove errors if they are zero; Default False
         color (matplotlib color): hex, rgb-tuple or html color name for the barplots; Default None
-        saturation (float): saturation value for the barplot colors; Default 0.75
+        saturation (float): saturation value for the barplot colors (only works if seaborn is installed); Default 0.75
         ax (matplotlib ax): Ax to draw the plots on; Default plt.gca()
         kwargs: Extra keyword arguments passed to the barplot functions
+
+    Returns:
+        (matplotlib.figure.Figure): Matplotlib figure handle
+
+    Required Libraries:
+        matplotlib
+        seaborn (optional)
 
     Example:
         >>> tide = bb.eval.TIDE(det, anno).mdAP
         >>> plot_tide(tide)
+        >>> plt.show()
     """
     import matplotlib.pyplot as plt
     try:
@@ -70,8 +143,8 @@ def plot_tide(tide_series, *, errors_lim=None, fpfn_lim=None, no_zero=False, col
     if fpfn_lim is not None:
         fpfn_ax.set_xlim(fpfn_lim)
 
-    return ax
+    return fig
 
 
 if __name__ == '__main__':
-    print('functions: plot_tide')
+    print('functions: plot_images, plot_tide')
