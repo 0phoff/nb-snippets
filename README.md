@@ -17,6 +17,13 @@ If you ever want to share a notebook with someone who might not have these snipp
 %load path/to/file.py
 ```
 
+The `%load` magic command also allows you to enter URLs, such as _https://raw.githubusercontent.com/0phoff/nb-snippets/master/plot.py_.
+Additionally, you can specify which functions you want to load with the `-s function_name` flag.
+
+```python
+%load -s plot_images https://raw.githubusercontent.com/0phoff/nb-snippets/master/plot.py
+```
+
 
 ## Why no package
 The alternative to these snippets is to create a python package and install it locally (eg. in dev mode).  
