@@ -3,13 +3,14 @@
 #   Tanguy Ophoff
 #
 
-def plot_images(*images, rows=1, titles=None, normalize=True):
+def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True):
     """
     This function can plot images in a grid with matplotlib.
 
     Args:
         *images (PIL.Image, torch.Tensor, np.ndarray): Images to plot (numpy arrays are expected to be BGR from opencv)
-        rows (int, optional): Number of rows in the grid; Default: 1
+        nrows (int, optional): Number of rows in the grid (takes precedence over `ncols`); Default: None
+        ncols (int, optional): Number of columns in the grid; Default: None
         titles (list[str], optional): Title strings for the different images; Default: None
         normalize (bool, optional): Whether to rescale the image data from min-max to 0-255; Default: True
 
@@ -49,8 +50,14 @@ def plot_images(*images, rows=1, titles=None, normalize=True):
 
     images = tuple(image_to_array(img) for img in images)
     avg_ratio = sum(img.shape[0] for img in images) / sum(img.shape[1] for img in images)
-    cols = math.ceil(len(images) / rows)
-    fig, axes = plt.subplots(rows, cols, figsize=(4*cols, 4*avg_ratio*rows), constrained_layout=True)
+    if nrows is not None:
+        ncols = math.ceil(len(images) / nrows)
+    elif ncols is not None:
+        nrows = math.ceil(len(images) / ncols)
+    else:
+        nrows = 1
+        ncols = len(images)        
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4*ncols, 4*avg_ratio*nrows), constrained_layout=True)
     axes = axes.flatten()
 
     for idx, (ax, img) in enumerate(zip(axes, images)):
