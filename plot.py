@@ -26,6 +26,7 @@ def plot_images(*images, rows=1, titles=None, normalize=True):
         >>> plot_images(img1, img2, img3, img4, rows=2)
         >>> plt.show()
     """
+    import math
     import numpy as np
     import matplotlib.pyplot as plt
     try:
@@ -40,15 +41,16 @@ def plot_images(*images, rows=1, titles=None, normalize=True):
     def image_to_array(img):
         if torch is not None and isinstance(img, torch.Tensor):
             return np.transpose(img.cpu().detach().numpy(), (1, 2, 0))
-        if Image is not None and isinstance(img, Image):
+        if Image is not None and isinstance(img, Image.Image):
             return np.asarray(img)
         if isinstance(img, np.ndarray) and img.ndim == 3:
             return img[..., ::-1]
         return np.asarray(img)
 
     images = tuple(image_to_array(img) for img in images)
+    avg_ratio = sum(img.shape[0] for img in images) / sum(img.shape[1] for img in images)
     cols = math.ceil(len(images) / rows)
-    fig, axes = plt.subplots(rows, cols, figsize=(5*cols,3*rows), constrained_layout=True)
+    fig, axes = plt.subplots(rows, cols, figsize=(4*cols, 4*avg_ratio*rows), constrained_layout=True)
     axes = axes.flatten()
 
     for idx, (ax, img) in enumerate(zip(axes, images)):
@@ -57,7 +59,7 @@ def plot_images(*images, rows=1, titles=None, normalize=True):
         else:
             ax.imshow(img, vmin=0, vmax=255 if img.max() > 1 else 1, cmap='gray')
         
-        ax.grid(None)
+        ax.grid(False)
         ax.tick_params(left=False, right=False, labelleft=False, labelbottom=False, bottom=False) 
         ax.spines['bottom'].set(edgecolor='black', lw=1)
         ax.spines['top'].set(edgecolor='black', lw=1)
