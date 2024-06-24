@@ -9,12 +9,12 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
 
     Args:
         *images (PIL.Image, torch.Tensor, np.ndarray): Images to plot (numpy arrays are expected to be BGR from opencv)
-        nrows (int, optional): Number of rows in the grid (takes precedence over `ncols`); Default: None
+        nrows (int, optional): Number of rows in the grid; Default: None
         ncols (int, optional): Number of columns in the grid; Default: None
         titles (list[str], optional): Title strings for the different images; Default: None
         normalize (bool, optional): Whether to rescale the image data from min-max to 0-255 (monochrome only); Default: True
         dpi (int, optional): Figure resolution; Default 100
-        backgorund (color, optional): Figure backgorund color; Default transparent
+        background (color, optional): Figure backgorund color; Default transparent
 
     Returns:
         (matplotlib.figure.Figure): Matplotlib figure handle
@@ -52,17 +52,22 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
 
     images = tuple(image_to_array(img) for img in images)
     avg_ratio = sum(img.shape[0] for img in images) / sum(img.shape[1] for img in images)
-    if nrows is not None:
-        ncols = math.ceil(len(images) / nrows)
-    elif ncols is not None:
-        nrows = math.ceil(len(images) / ncols)
-    else:
+    if nrows is None and ncols is None:
         nrows = 1
         ncols = len(images)
+    elif nrows is None:
+        nrows = math.ceil(len(images) / ncols)
+    elif ncols is None:
+        ncols = math.ceil(len(images) / nrows)
     fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 3*avg_ratio*nrows), dpi=dpi, constrained_layout=True)
-    axes = axes.flatten()
+    axes = axes.flatten() if nrows * ncols > 1 else [axes]
+    
     if background is not None:
         fig.patch.set_facecolor(background)
+    for ax in axes:
+        ax.grid(False)
+        ax.tick_params(left=False, right=False, labelleft=False, labelbottom=False, bottom=False)
+        ax.set_frame_on(False)
 
     for idx, (ax, img) in enumerate(zip(axes, images)):
         if normalize:
@@ -70,12 +75,8 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
         else:
             ax.imshow(img, vmin=0, vmax=255 if img.max() > 1 else 1, cmap='gray')
         
-        ax.grid(False)
-        ax.tick_params(left=False, right=False, labelleft=False, labelbottom=False, bottom=False) 
-        ax.spines['bottom'].set(edgecolor='black', lw=1)
-        ax.spines['top'].set(edgecolor='black', lw=1)
-        ax.spines['left'].set(edgecolor='black', lw=1)
-        ax.spines['right'].set(edgecolor='black', lw=1)
+        ax.spines[:].set_edgecolor('black')
+        ax.spines[:].set_linewidth(1)
         if titles is not None and len(titles) > idx:
             ax.set_title(titles[idx])
 
