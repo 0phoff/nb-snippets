@@ -74,7 +74,8 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
             ax.imshow(img, cmap='gray')
         else:
             ax.imshow(img, vmin=0, vmax=255 if img.max() > 1 else 1, cmap='gray')
-        
+
+        ax.set_frame_on(True)
         ax.spines[:].set_edgecolor('black')
         ax.spines[:].set_linewidth(1)
         if titles is not None and len(titles) > idx:
