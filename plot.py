@@ -3,7 +3,7 @@
 #   Tanguy Ophoff
 #
 
-def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True):
+def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dpi=300, background=None):
     """
     This function can plot images in a grid with matplotlib.
 
@@ -12,7 +12,9 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True):
         nrows (int, optional): Number of rows in the grid (takes precedence over `ncols`); Default: None
         ncols (int, optional): Number of columns in the grid; Default: None
         titles (list[str], optional): Title strings for the different images; Default: None
-        normalize (bool, optional): Whether to rescale the image data from min-max to 0-255; Default: True
+        normalize (bool, optional): Whether to rescale the image data from min-max to 0-255 (monochrome only); Default: True
+        dpi (int, optional): Figure resolution; Default 300
+        backgorund (color, optional): Figure backgorund color; Default transparent
 
     Returns:
         (matplotlib.figure.Figure): Matplotlib figure handle
@@ -56,9 +58,11 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True):
         nrows = math.ceil(len(images) / ncols)
     else:
         nrows = 1
-        ncols = len(images)        
-    fig, axes = plt.subplots(nrows, ncols, figsize=(4*ncols, 4*avg_ratio*nrows), constrained_layout=True)
+        ncols = len(images)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols, avg_ratio*nrows), dpi=dpi, constrained_layout=True)
     axes = axes.flatten()
+    if background is not None:
+        fig.patch.set_facecolor(background)
 
     for idx, (ax, img) in enumerate(zip(axes, images)):
         if normalize:
