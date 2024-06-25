@@ -72,3 +72,7 @@ def stratified_splits(df, split_percentages, *, class_column=None, stratify_colu
     
     assert sum(len(s) for s in splits) == df.shape[0], 'All elements should be chosen'
     return splits
+
+
+if __name__ == '__main__':
+    print('functions: stratified_splits')
