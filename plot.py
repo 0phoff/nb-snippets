@@ -3,15 +3,17 @@
 #   Tanguy Ophoff
 #
 
-def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dpi=100, background=None):
+def plot_images(*images, nrows=None, ncols=None, titles=None, row_titles=None, col_titles=None, normalize=True, dpi=100, background=None):
     """
     This function can plot images in a grid with matplotlib.
 
     Args:
-        *images (PIL.Image, torch.Tensor, np.ndarray): Images to plot (numpy arrays are expected to be BGR from opencv)
+        *images (PIL.Image, torch.Tensor, np.ndarray, None): Images to plot (numpy arrays are expected to be BGR from opencv)
         nrows (int, optional): Number of rows in the grid; Default: None
         ncols (int, optional): Number of columns in the grid; Default: None
         titles (list[str], optional): Title strings for the different images; Default: None
+        row_titles (list[str], optional): Title strings for the rows (ylabel of left-most image per row); Default: None
+        col_titles (list[str], optional): Title strings for the columns (xlabel of top-most image per column) (cannot be combined with `titles`); Default: None
         normalize (bool, optional): Whether to rescale the image data from min-max to 0-255 (monochrome only); Default: True
         dpi (int, optional): Figure resolution; Default 100
         background (color, optional): Figure backgorund color; Default transparent
@@ -26,7 +28,7 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
         PIL (optional)
 
     Example:
-        >>> plot_images(img1, img2, img3, img4, rows=2)
+        >>> plot_images(img1, img2, img3, img4, nrows=2)
         >>> plt.show()
     """
     import math
@@ -42,6 +44,8 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
         Image = None
 
     def image_to_array(img):
+        if img is None:
+            return img
         if torch is not None and isinstance(img, torch.Tensor):
             return np.transpose(img.cpu().detach().numpy(), (1, 2, 0))
         if Image is not None and isinstance(img, Image.Image):
@@ -51,7 +55,7 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
         return np.asarray(img)
 
     images = tuple(image_to_array(img) for img in images)
-    avg_ratio = sum(img.shape[0] for img in images) / sum(img.shape[1] for img in images)
+    avg_ratio = sum(img.shape[0] for img in images if img is not None) / sum(img.shape[1] for img in images if img is not None)
     if nrows is None and ncols is None:
         nrows = 1
         ncols = len(images)
@@ -70,6 +74,8 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
         ax.set_frame_on(False)
 
     for idx, (ax, img) in enumerate(zip(axes, images)):
+        if img is None:
+            continue
         if normalize:
             ax.imshow(img, cmap='gray')
         else:
@@ -80,6 +86,19 @@ def plot_images(*images, nrows=None, ncols=None, titles=None, normalize=True, dp
         ax.spines[:].set_linewidth(1)
         if titles is not None and len(titles) > idx:
             ax.set_title(titles[idx])
+
+    if row_titles is not None:
+        for idx, title in enumerate(row_titles):
+            if idx >= nrows:
+                break
+            axes[idx * ncols].set_ylabel(title)
+            
+    if col_titles is not None and titles is None:
+        for idx, title in enumerate(col_titles):
+            if idx >= ncols:
+                break
+            axes[idx].set_xlabel(title)
+            axes[idx].xaxis.set_label_position('top') 
 
     return fig
 
